@@ -64,6 +64,11 @@ def millones(valor):
     return signo + f"US${abs(valor) / 1e6:,.2f} M".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def md(texto):
+    """Streamlit lee $...$ como fórmula matemática: escapamos los US$ en textos con markdown."""
+    return texto.replace("$", "\\$")
+
+
 def porcentaje(valor, decimales=1):
     return f"{valor * 100:.{decimales}f} %".replace(".", ",")
 
@@ -77,13 +82,13 @@ def accion_tema(tema):
 # La recomendación va arriba y dice claramente que la regla empata con el modelo
 # ---------------------------------------------------------------------------------------------
 a, b = m["intervalo_diferencia"]
-st.info(
+st.info(md(
     f"**Recomendación:** para decidir si firmar, la **regla de la constancia** basta: "
     f"{extra['regla_final'].lower()}. En la prueba de 2024 la regla y el radar costaron lo mismo, "
     f"{millones(m['costo_regla'])} por cada 100 importadores evaluados (el ahorro del radar frente a la regla va de "
     f"{millones(a)} a {millones(b)}, así que no es distinto de cero). El radar sirve para **ordenar** a los aprobados, explicar cada recomendación "
     f"y mostrar quién vende lo mismo que Seoru."
-)
+))
 
 pestanas = st.tabs(["Lista de 20", "Radar 2026", "Consultar un importador", "Evaluar uno nuevo",
                     "¿Cuánto vale el radar?", "Cómo decide"])
@@ -186,7 +191,7 @@ with pestanas[2]:
         st.markdown(
             f"- **Tipo de productos:** {fila['tema']}. {accion_tema(fila['tema'])}\n"
             f"- **Afinidad con Seoru:** {fila['afinidad_pct']:.0f} % de sus productos notificados se parecen a los de Seoru\n"
-            f"- **Valor importado:** {fila['rango_valor']} · **Meses con importaciones:** {fila['rango_meses']}\n"
+            f"- **Valor importado:** {md(fila['rango_valor'])} · **Meses con importaciones:** {fila['rango_meses']}\n"
             f"- **Lista de 20:** {'puesto ' + str(puesto) if puesto > 0 else 'no está'}"
             + (" · es **dueño de marca**, así que no ocupa cupo en la diligencia debida" if fila["dueno_marca_txt"] == "Sí" else "")
         )
@@ -249,12 +254,12 @@ with pestanas[4]:
     c2.metric("Costo con la regla", millones(m["costo_regla"]))
     c3.metric("Ahorro del radar frente a la regla", millones(m["costo_regla"] - m["costo_modelo"]))
     c4.metric("Ahorro frente a decidir sin criterio", millones(sin_criterio - m["costo_modelo"]))
-    st.markdown(
+    st.markdown(md(
         f"Para decidir si firmar, **el radar no le gana a la regla**: el ahorro es de {millones(m['costo_regla'] - m['costo_modelo'])} "
         f"por cada 100 importadores y su intervalo de 95 % va de {millones(a)} a {millones(b)}, así que incluye el cero. "
         f"Las dos herramientas ahorran unos {millones(sin_criterio - m['costo_modelo'])} por cada 100 frente a la mejor "
         f"decisión sin criterio. El valor del radar está en el orden de la lista, las razones y el encaje con Seoru."
-    )
+    ))
     graf = comparacion.copy()
     graf["Costo"] = graf["Costo por 100"] / 1e6
     graf["Desde"] = graf["IC inf"] / 1e6
@@ -276,10 +281,10 @@ with pestanas[4]:
     st.dataframe(detalle, hide_index=True, width="stretch",
                  column_config={c: st.column_config.NumberColumn(c + " (US$ M)", format="%.2f")
                                 for c in ["Costo por 100", "IC inf", "IC sup", "Dif. vs regla"]})
-    st.caption("Supuestos del caso: firmar con un importador que abandona cuesta US$250.000; no firmar con uno que habría "
+    st.caption(md("Supuestos del caso: firmar con un importador que abandona cuesta US$250.000; no firmar con uno que habría "
                "funcionado, US$50.000; las garantías cuestan US$20.000 y, si el importador abandona igual, se pierden "
                "US$100.000 más. Medido en los 484 importadores de 2024 con el modelo entrenado en 2023; intervalos por "
-               "bootstrap de 1.000 muestras.")
+               "bootstrap de 1.000 muestras."))
 
 
 # ---------------------------------------------------------------------------------------------
