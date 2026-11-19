@@ -1,0 +1,15 @@
+{
+  "pesos_lista": {
+    "riesgo": 0.5,
+    "afinidad": 0.3,
+    "tamano": 0.2
+  },
+  "regla_final": "No firmar si importó menos de 6 meses; garantías si importó 6; firmar desde 7",
+  "a_regla": 6,
+  "b_regla": 7,
+  "u1": 0.17,
+  "u2": 0.22,
+  "radar": "Bosque aleatorio",
+  "elegibles": 271,
+  "n_radar": 523
+}
